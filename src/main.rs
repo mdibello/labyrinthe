@@ -92,7 +92,7 @@ impl Display for Maze {
 }
 
 fn main() {
-    println!("{}", binary_tree_maze(10, 10));
+    println!("{}", sidewinder_maze(10, 10));
 }
 
 fn binary_tree_maze(w: usize, h: usize) -> Maze {
@@ -114,6 +114,39 @@ fn binary_tree_maze(w: usize, h: usize) -> Maze {
                 } else {
                     maze.grid[y*w+x].walls &= 13;
                     maze.grid[y*w+x+1].walls &= 14;
+                }
+            }
+        }
+    }
+    return maze;
+}
+
+fn sidewinder_maze(w: usize, h: usize) -> Maze {
+    let mut maze = Maze::new(w, h);
+    let mut cluster: Vec<usize> = Vec::new();
+    for y in 0..h {
+        cluster.clear();
+        for x in 0..w {
+            cluster.push(x.clone());
+            if x == w-1 && y == 0 {
+                // nothing
+            } else if x == w-1 {
+                let n = rand::thread_rng().gen_range(cluster[0], cluster.pop().unwrap()+1);
+                maze.grid[y*w+n].walls &= 7;
+                maze.grid[(y-1)*w+n].walls &= 11;
+                cluster.clear();
+            } else if y == 0 {
+                maze.grid[y*w+x].walls &= 13;
+                maze.grid[y*w+x+1].walls &= 14;
+            } else {
+                if rand::thread_rng().gen_range(0, 2) == 0 {
+                    maze.grid[y*w+x].walls &= 13;
+                    maze.grid[y*w+x+1].walls &= 14;
+                } else {
+                    let n = rand::thread_rng().gen_range(cluster[0], cluster.pop().unwrap()+1);
+                    maze.grid[y*w+n].walls &= 7;
+                    maze.grid[(y-1)*w+n].walls &= 11;
+                    cluster.clear();
                 }
             }
         }
